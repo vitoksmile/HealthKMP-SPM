@@ -23,10 +23,21 @@ HealthKMP supports:
 Note that for Android, the target device **needs** to have [Google Fit](https://www.google.com/fit/) or [Health Connect](https://health.google/health-connect-android/) installed.
 
 ## Supported data types (iOS, watchOS, Android)
+- Blood glucose
+- Blood pressure
+- Body temperature
 - Heart rate
+- Height
 - Sleep
 - Steps
 - Weight
+
+## Supported units
+- Blood glucose: mmol/L, mg/dL
+- Length: meters, kilometers, miles, inches, feet
+- Mass: grams, kilograms, milligrams, micrograms, ounces, pounds
+- Pressure: millimeters of Mercury (mmHg)
+- Temperature: Celsius, Fahrenheit
 
 ## Requesting permission
 
@@ -60,7 +71,7 @@ build.gradle:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("com.viktormykhailiv:health-kmp:0.0.10")
+            implementation("com.viktormykhailiv:health-kmp:0.0.11")
         }
     }
 }
@@ -69,7 +80,7 @@ sourceSets {
 or use version catalog:
 ```
 [versions]
-health = "0.0.10"
+health = "0.0.11"
 
 [libraries]
 health = { module = "com.viktormykhailiv:health-kmp", version.ref = "health" }
@@ -157,14 +168,14 @@ Check if any Health service is available on the device: HealthKit on iOS or watc
 val health = HealthManagerFactory().createManager()
 
 health.isAvailable()
-   .onSuccess { isAvailable ->
-      if (!isAvailable) {
-         println("No Health service is available on the device")
-      }
-   }
-   .onFailure { error ->
-      println("Failed to check if Health service is available $error")
-   }
+    .onSuccess { isAvailable ->
+        if (!isAvailable) {
+            println("No Health service is available on the device")
+        }
+    }
+    .onFailure { error ->
+        println("Failed to check if Health service is available $error")
+    }
 ```
 
 ### Request access
@@ -173,27 +184,33 @@ Requesting access to data types before reading them
 
 ```kotlin
 health.requestAuthorization(
-   readTypes = listOf(
-      HeartRate,
-      Sleep,
-      Steps,
-      Weight,
-   ),
-   writeTypes = listOf(
-      HeartRate,
-      Sleep,
-      Steps,
-      Weight,
-   ),
+    readTypes = listOf(
+        BloodGlucose,
+        BloodPressure,
+        HeartRate,
+        Height,
+        Sleep,
+        Steps,
+        Weight,
+    ),
+    writeTypes = listOf(
+        BloodGlucose,
+        BloodPressure,
+        HeartRate,
+        Height,
+        Sleep,
+        Steps,
+        Weight,
+    ),
 )
-   .onSuccess { isAuthorized ->
-      if (!isAuthorized) {
-         println("Not authorized")
-      }
-   }
-   .onFailure { error ->
-      println("Failed to authorize $error")
-   }
+    .onSuccess { isAuthorized ->
+        if (!isAuthorized) {
+            println("Not authorized")
+        }
+    }
+    .onFailure { error ->
+        println("Failed to authorize $error")
+    }
 ```
 
 ### Read sleep
@@ -202,24 +219,24 @@ Read detailed sleep data for last 24 hours
 
 ```kotlin
 health.readSleep(
-   startTime = Clock.System.now().minus(24.hours),
-   endTime = Clock.System.now(),
+    startTime = Clock.System.now().minus(24.hours),
+    endTime = Clock.System.now(),
 ).onSuccess { sleepRecords ->
-   sleepRecords.forEach { sleep ->
-      println("Sleep duration ${sleep.duration}")
+    sleepRecords.forEach { sleep ->
+        println("Sleep duration ${sleep.duration}")
 
-      // Calculate duration of each sleep stage
-      sleep.stages.groupBy { it.type }
-         .forEach { (type, stages) ->
-            val stageDuration = stages.sumOf { it.duration.inWholeMinutes }.minutes
-            println("Sleep stage $type $stageDuration")
-         }
-   }
-   if (sleepRecords.isEmpty()) {
-      println("No sleep data")
-   }
+        // Calculate duration of each sleep stage
+        sleep.stages.groupBy { it.type }
+            .forEach { (type, stages) ->
+                val stageDuration = stages.sumOf { it.duration.inWholeMinutes }.minutes
+                println("Sleep stage $type $stageDuration")
+            }
+    }
+    if (sleepRecords.isEmpty()) {
+        println("No sleep data")
+    }
 }.onFailure { error ->
-   println("Failed to read sleep $error")
+    println("Failed to read sleep $error")
 }
 ```
 
@@ -227,10 +244,10 @@ Read aggregated sleep data for last month
 
 ```kotlin
 health.aggregateSleep(
-   startTime = Clock.System.now().minus(30.days),
-   endTime = Clock.System.now(),
+    startTime = Clock.System.now().minus(30.days),
+    endTime = Clock.System.now(),
 ).onSuccess { sleep ->
-   println("Sleep total duration ${sleep.totalDuration}")
+    println("Sleep total duration ${sleep.totalDuration}")
 }
 ```
 
@@ -240,17 +257,17 @@ Read detailed steps data for last day
 
 ```kotlin
 health.readSteps(
-   startTime = Clock.System.now().minus(1.days),
-   endTime = Clock.System.now(),
+    startTime = Clock.System.now().minus(1.days),
+    endTime = Clock.System.now(),
 ).onSuccess { steps ->
-   steps.forEachIndexed { index, record ->
-      println("[$index] ${record.count} steps for ${record.duration}")
-   }
-   if (steps.isEmpty()) {
-      println("No steps data")
-   }
+    steps.forEachIndexed { index, record ->
+        println("[$index] ${record.count} steps for ${record.duration}")
+    }
+    if (steps.isEmpty()) {
+        println("No steps data")
+    }
 }.onFailure { error ->
-   println("Failed to read steps $error")
+    println("Failed to read steps $error")
 }
 ```
 
@@ -258,10 +275,10 @@ Read aggregated steps data for last day
 
 ```kotlin
 health.aggregateSteps(
-   startTime = Clock.System.now().minus(1.days),
-   endTime = Clock.System.now(),
+    startTime = Clock.System.now().minus(1.days),
+    endTime = Clock.System.now(),
 ).onSuccess { steps ->
-   println("Steps total ${steps.count}")
+    println("Steps total ${steps.count}")
 }
 ```
 
@@ -271,17 +288,17 @@ Read detailed weight data for last year
 
 ```kotlin
 health.readWeight(
-   startTime = Clock.System.now().minus(365.days),
-   endTime = Clock.System.now(),
+    startTime = Clock.System.now().minus(365.days),
+    endTime = Clock.System.now(),
 ).onSuccess { records ->
-   records.forEachIndexed { index, record ->
-      println("[$index] ${record.weight} at ${record.time}")
-   }
-   if (records.isEmpty()) {
-      println("No weight data")
-   }
+    records.forEachIndexed { index, record ->
+        println("[$index] ${record.weight} at ${record.time}")
+    }
+    if (records.isEmpty()) {
+        println("No weight data")
+    }
 }.onFailure { error ->
-   println("Failed to read weight $error")
+    println("Failed to read weight $error")
 }
 ```
 
@@ -289,10 +306,10 @@ Read aggregated weight data for last year
 
 ```kotlin
 health.aggregateWeight(
-   startTime = Clock.System.now().minus(365.hours),
-   endTime = Clock.System.now(),
+    startTime = Clock.System.now().minus(365.hours),
+    endTime = Clock.System.now(),
 ).onSuccess { weight ->
-   println("Weight avg ${weight.avg} kg, min ${weight.min}, max ${weight.max}")
+    println("Weight avg ${weight.avg} kg, min ${weight.min}, max ${weight.max}")
 }
 ```
 
@@ -304,28 +321,28 @@ Write sleep data for 1 hours
 val startTime = Clock.System.now().minus(12.hours)
 val endTime = Clock.System.now().minus(11.hours)
 val types = listOf(
-   SleepStageType.Awake,
-   SleepStageType.OutOfBed,
-   SleepStageType.Sleeping,
-   SleepStageType.Light,
-   SleepStageType.Deep,
-   SleepStageType.REM,
+    SleepStageType.Awake,
+    SleepStageType.OutOfBed,
+    SleepStageType.Sleeping,
+    SleepStageType.Light,
+    SleepStageType.Deep,
+    SleepStageType.REM,
 )
 health.writeData(
-   records = listOf(
-      SleepSessionRecord(
-         startTime = startTime,
-         endTime = endTime,
-         stages = List(6) {
-            SleepSessionRecord.Stage(
-               startTime = startTime.plus((10 * it).minutes),
-               endTime = startTime.plus((10 * it).minutes + 10.minutes),
-               type = types[it],
-            )
-         },
-         metadata = generateMetadata(),
-      )
-   )
+    records = listOf(
+        SleepSessionRecord(
+            startTime = startTime,
+            endTime = endTime,
+            stages = List(6) {
+                SleepSessionRecord.Stage(
+                    startTime = startTime.plus((10 * it).minutes),
+                    endTime = startTime.plus((10 * it).minutes + 10.minutes),
+                    type = types[it],
+                )
+            },
+            metadata = generateMetadata(),
+        )
+    )
 )
 ```
 
@@ -333,20 +350,20 @@ health.writeData(
 
 ```kotlin
 health.writeData(
-   records = listOf(
-      StepsRecord(
-         startTime = Clock.System.now().minus(1.days).minus(3.hours),
-         endTime = Clock.System.now().minus(1.days).minus(1.hours),
-         count = 75,
-         metadata = generateMetadata(),
-      ),
-      StepsRecord(
-         startTime = Clock.System.now().minus(1.hours),
-         endTime = Clock.System.now(),
-         count = 123,
-         metadata = generateMetadata(),
-      ),
-   )
+    records = listOf(
+        StepsRecord(
+            startTime = Clock.System.now().minus(1.days).minus(3.hours),
+            endTime = Clock.System.now().minus(1.days).minus(1.hours),
+            count = 75,
+            metadata = generateMetadata(),
+        ),
+        StepsRecord(
+            startTime = Clock.System.now().minus(1.hours),
+            endTime = Clock.System.now(),
+            count = 123,
+            metadata = generateMetadata(),
+        ),
+    )
 )
 ```
 
@@ -356,20 +373,20 @@ There are different supported `Mass` units: kilograms, ounces, pounds, grams, mi
 
 ```kotlin
 health.writeData(
-   records = listOf(
-      // Weight in kilograms
-      WeightRecord(
-         time = Clock.System.now().minus(1.days),
-         weight = Mass.kilograms(61.2),
-         metadata = generateMetadata(),
-      ),
-      // Weight in pounds
-      WeightRecord(
-         time = Clock.System.now(),
-         weight = Mass.pounds(147.71),
-         metadata = generateMetadata(),
-      ),
-   )
+    records = listOf(
+        // Weight in kilograms
+        WeightRecord(
+            time = Clock.System.now().minus(1.days),
+            weight = Mass.kilograms(61.2),
+            metadata = generateMetadata(),
+        ),
+        // Weight in pounds
+        WeightRecord(
+            time = Clock.System.now(),
+            weight = Mass.pounds(147.71),
+            metadata = generateMetadata(),
+        ),
+    )
 )
 ```
 
@@ -380,10 +397,10 @@ recorded, unique identifier of data, and device information associated with the 
 
 ```kotlin
 fun generateMetadata() : Metadata {
-   return Metadata.manualEntry(
-      id = Uuid.random().toString(),
-      device = Device.getLocalDevice(),
-   )
+    return Metadata.manualEntry(
+        id = Uuid.random().toString(),
+        device = Device.getLocalDevice(),
+    )
 }
 ```
 
