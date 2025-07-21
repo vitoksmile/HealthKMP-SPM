@@ -7,6 +7,7 @@ let package = Package(
     name: packageName,
     platforms: [
         .iOS(.v18),
+        .watchOS(.v11),
     ],
     products: [
         .library(
@@ -17,8 +18,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: packageName,
-            url: "https://github.com/vitoksmile/HealthKMP/releases/download/0.0.9/HealthKMP.xcframework.zip",
-            checksum:"7523028fbb4128af2f3c5ece56a67dc4ee796e558f06c3d33a98950c89bc2d22"
+            url: "https://github.com/vitoksmile/HealthKMP/releases/download/0.0.11/HealthKMP.xcframework.zip",
+            checksum:"32c67fd3e0be9ace5f2be0923dfa7c2571fe4cb47dd48fabbf27daf654e75222"
         ),
     ]
 )
