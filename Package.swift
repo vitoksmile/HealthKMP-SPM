@@ -18,8 +18,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: packageName,
-            url: "https://github.com/vitoksmile/HealthKMP/releases/download/0.0.16/HealthKMP.xcframework.zip",
-            checksum:"fdfa7dc9c3521ae788fde88bc25adacdccc563753d4fcec61aa6034a0e5dd733"
+            url: "https://github.com/vitoksmile/HealthKMP/releases/download/0.0.17/HealthKMP.xcframework.zip",
+            checksum:"d1f787859fbf8a5be07cfade93dcf9b5e095883f875ed4ec926a2fbbaceabc45"
         ),
     ]
 )
