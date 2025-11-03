@@ -74,9 +74,9 @@ settings.gradle.kts:
 
 ```kotlin
 dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-    }
+   repositories {
+      mavenCentral()
+   }
 }
 ```
 
@@ -86,7 +86,7 @@ build.gradle:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("com.viktormykhailiv:health-kmp:0.0.15")
+            implementation("com.viktormykhailiv:health-kmp:0.0.16")
         }
     }
 }
@@ -96,7 +96,7 @@ or use version catalog:
 
 ```
 [versions]
-health = "0.0.15"
+health = "0.0.16"
 
 [libraries]
 health = { module = "com.viktormykhailiv:health-kmp", version.ref = "health" }
@@ -414,10 +414,10 @@ recorded, unique identifier of data, and device information associated with the 
 
 ```kotlin
 fun generateMetadata(): Metadata {
-    return Metadata.manualEntry(
-        id = Uuid.random().toString(),
-        device = Device.getLocalDevice(),
-    )
+   return Metadata.manualEntry(
+      id = Uuid.random().toString(),
+      device = Device.getLocalDevice(),
+   )
 }
 ```
 
