@@ -3,7 +3,7 @@
 # HealthKMP
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.viktormykhailiv/health-kmp)](https://central.sonatype.com/search?namespace=com.viktormykhailiv&name=health-kmp)
-[![Kotlin](https://img.shields.io/badge/kotlin-2.3.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.3.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![](https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin)](https://kotlinlang.org/docs/multiplatform.html)
 [![](http://img.shields.io/badge/platform-android-6EDB8D?style=flat)](https://kotlinlang.org/docs/multiplatform.html)
 [![](http://img.shields.io/badge/platform-ios-CDCDCD?style=flat)](https://kotlinlang.org/docs/multiplatform.html)
@@ -44,6 +44,7 @@ Note that for Android, the target device **needs** to have [Google Fit](https://
 ## Supported units
 
 - Blood glucose: mmol/L, mg/dL
+- Energy: calories, kilocalories, joules, kilojoules
 - Length: meters, kilometers, miles, inches, feet
 - Mass: grams, kilograms, milligrams, micrograms, ounces, pounds
 - Power: watts, kilocalories per day
@@ -89,7 +90,7 @@ build.gradle:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("com.viktormykhailiv:health-kmp:0.0.17")
+            implementation("com.viktormykhailiv:health-kmp:1.2.0")
         }
     }
 }
@@ -99,7 +100,7 @@ or use version catalog:
 
 ```
 [versions]
-health = "0.0.17"
+health = "1.2.0"
 
 [libraries]
 health = { module = "com.viktormykhailiv:health-kmp", version.ref = "health" }
