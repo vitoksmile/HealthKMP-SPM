@@ -78,9 +78,9 @@ settings.gradle.kts:
 
 ```kotlin
 dependencyResolutionManagement {
-    repositories {
-        mavenCentral()
-    }
+   repositories {
+      mavenCentral()
+   }
 }
 ```
 
@@ -88,11 +88,11 @@ build.gradle:
 
 ```kotlin
 sourceSets {
-    val commonMain by getting {
-        dependencies {
-            implementation("com.viktormykhailiv:health-kmp:1.2.0")
-        }
-    }
+   val commonMain by getting {
+      dependencies {
+         implementation("com.viktormykhailiv:health-kmp:1.3.0")
+      }
+   }
 }
 ```
 
@@ -100,7 +100,7 @@ or use version catalog:
 
 ```
 [versions]
-health = "1.2.0"
+health = "1.3.0"
 
 [libraries]
 health = { module = "com.viktormykhailiv:health-kmp", version.ref = "health" }
@@ -183,10 +183,17 @@ The Health plugin is used via the `HealthManagerFactory` class using the differe
 
 ### Check availability
 
-Check if any Health service is available on the device: HealthKit on iOS or watchOS, and Google Fit or Health Connect on Android
+Check if any Health service is available on the device: HealthKit on iOS or watchOS, and Google Fit or Health Connect on Android.
+
+By default, on Android, if Health Connect is not available, it will try to use Google Fit. You can change this behavior by providing `HealthManagerFactoryOptions`.
 
 ```kotlin
+// Default behavior: uses Health Connect if available, otherwise Google Fit
 val health = HealthManagerFactory().createManager()
+
+// Or specify options to disable Google Fit fallback on Android
+val options = HealthManagerFactoryOptions(useGoogleFit = false)
+val health = HealthManagerFactory().createManager(options)
 
 health.isAvailable()
     .onSuccess { isAvailable ->
@@ -197,6 +204,37 @@ health.isAvailable()
     .onFailure { error ->
         println("Failed to check if Health service is available $error")
     }
+```
+
+### Background synchronization
+
+To read health data in the background, you need to request the `READ_HEALTH_DATA_IN_BACKGROUND` permission on Android.
+
+Android `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND" />
+```
+
+Request background permission:
+
+```kotlin
+health.requestReadHealthDataInBackgroundPermission()
+    .onSuccess { isGranted ->
+        if (isGranted) {
+            println("Background read permission granted")
+        }
+    }
+```
+
+Or you can request it during the standard authorization flow:
+
+```kotlin
+health.requestAuthorization(
+    readTypes = readTypes,
+    writeTypes = writeTypes,
+    requestReadHealthDataInBackground = true,
+)
 ```
 
 ### Request access
@@ -418,10 +456,10 @@ recorded, unique identifier of data, and device information associated with the 
 
 ```kotlin
 fun generateMetadata(): Metadata {
-   return Metadata.manualEntry(
-      id = Uuid.random().toString(),
-      device = Device.getLocalDevice(),
-   )
+    return Metadata.manualEntry(
+        id = Uuid.random().toString(),
+        device = Device.getLocalDevice(),
+    )
 }
 ```
 
